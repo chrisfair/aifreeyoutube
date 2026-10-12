@@ -37,6 +37,9 @@ const state = reactive({
   /** @type {object|null} Global lifetime statistics */
   globalStats: null,
 
+  /** @type {string} Player mode: 'premium' (youtube.com with Google Account cookies for 0 ads) or 'privacy' (youtube-nocookie.com) */
+  playerMode: (typeof localStorage !== 'undefined' && localStorage.getItem('aifreeyoutube_player_mode')) || 'premium',
+
   /** UI Dialog/Drawer controls */
   isSettingsOpen: false,
   isQuarantineOpen: false,
@@ -177,11 +180,25 @@ export function toggleQuarantineDrawer(open) {
 }
 
 /**
+ * Toggles between 'premium' (ad-free with YouTube account session) and 'privacy' (nocookie) player modes.
+ * @param {'premium'|'privacy'} mode
+ */
+export function setPlayerMode(mode) {
+  state.playerMode = mode;
+  try {
+    localStorage.setItem('aifreeyoutube_player_mode', mode);
+  } catch (err) {
+    console.error('Failed to persist player mode:', err);
+  }
+}
+
+/**
  * Export state and computed properties
  */
 export function useFilterStore() {
   return {
     state,
+    playerMode: computed(() => state.playerMode),
     sensitivityMode: computed(() => state.settings.sensitivityMode),
     thresholdPercent: computed(() => Math.round(state.settings.threshold * 100)),
     quarantinedCount: computed(() => state.quarantinedCount),
@@ -193,6 +210,7 @@ export function useFilterStore() {
     isQuarantineOpen: computed(() => state.isQuarantineOpen),
     isShieldModalOpen: computed(() => state.isShieldModalOpen),
 
+    setPlayerMode,
     fetchFilterSettings,
     saveFilterSettings,
     fetchGlobalStats,

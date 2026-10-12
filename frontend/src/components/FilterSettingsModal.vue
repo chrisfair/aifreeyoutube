@@ -108,6 +108,45 @@
           </div>
         </div>
 
+        <!-- Playback Mode & YouTube Premium -->
+        <div class="section-group">
+          <label class="group-label">Playback & YouTube Premium (Web & Desktop)</label>
+          <p class="field-hint">
+            If you pay for YouTube Premium, choose Premium Mode so YouTube recognizes your logged-in Google account for zero ads.
+          </p>
+          <div class="toggle-list">
+            <label class="toggle-item">
+              <input
+                type="radio"
+                name="playerModeSetting"
+                value="premium"
+                :checked="filterStore.playerMode.value === 'premium'"
+                @change="filterStore.setPlayerMode('premium')"
+                class="toggle-checkbox"
+              />
+              <div class="toggle-text">
+                <span class="toggle-title">★ YouTube Premium Mode (Ad-Free Browser Session)</span>
+                <span class="toggle-sub">Uses youtube.com embed with your browser's Google account session for 100% ad-free video playback and Premium perks.</span>
+              </div>
+            </label>
+
+            <label class="toggle-item">
+              <input
+                type="radio"
+                name="playerModeSetting"
+                value="privacy"
+                :checked="filterStore.playerMode.value === 'privacy'"
+                @change="filterStore.setPlayerMode('privacy')"
+                class="toggle-checkbox"
+              />
+              <div class="toggle-text">
+                <span class="toggle-title">🛡 Strict Privacy Mode (youtube-nocookie.com)</span>
+                <span class="toggle-sub">Strips all cookies and Google account session headers for complete anonymity (may show guest ads).</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
         <!-- Custom Keyword Blacklist -->
         <div class="section-group">
           <label class="group-label">Custom Keyword Blocklist</label>

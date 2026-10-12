@@ -75,6 +75,20 @@ run-server: server
 	@echo "==> Launching standalone web server on http://localhost:8080..."
 	./bin/aifreeyoutube-server
 
+service-start: server
+	@echo "==> Enabling and starting AI-Free YouTube background service..."
+	systemctl --user daemon-reload
+	systemctl --user enable --now aifreeyoutube
+	@echo "==> Service active! Web app available at http://localhost:8080"
+
+service-stop:
+	@echo "==> Stopping AI-Free YouTube background service..."
+	systemctl --user stop aifreeyoutube
+	@echo "==> Service stopped."
+
+service-status:
+	@systemctl --user status aifreeyoutube
+
 # ------------------------------------------------------------------------------
 # Quality Assurance & Cleaning
 # ------------------------------------------------------------------------------
