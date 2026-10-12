@@ -1,0 +1,19 @@
+# Binaries and build artifacts
+backend/server
+*.exe
+*.test
+*.out
+
+# Frontend dependencies and builds
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Logs and environment
+*.log
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db

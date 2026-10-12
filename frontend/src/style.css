@@ -1,0 +1,186 @@
+/* AI-Free YouTube: Design System & Core Typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg-primary: #0a0d14;
+  --bg-secondary: #111722;
+  --bg-card: #161f2e;
+  --bg-card-hover: #1c273a;
+  --border-subtle: #243247;
+  --border-focus: #3b82f6;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --accent-shield: #10b981;
+  --accent-shield-bg: rgba(16, 185, 129, 0.12);
+  --accent-shield-border: rgba(16, 185, 129, 0.3);
+
+  --accent-warning: #f59e0b;
+  --accent-warning-bg: rgba(245, 158, 11, 0.12);
+
+  --accent-danger: #f43f5e;
+  --accent-danger-bg: rgba(244, 63, 94, 0.12);
+  --accent-danger-border: rgba(244, 63, 94, 0.35);
+
+  --accent-primary: #3b82f6;
+  --accent-primary-hover: #2563eb;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #27354a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #394b66;
+}
+
+/* Common utility classes */
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-clean {
+  background-color: var(--accent-shield-bg);
+  color: var(--accent-shield);
+  border: 1px solid var(--accent-shield-border);
+}
+
+.badge-suspicious {
+  background-color: var(--accent-warning-bg);
+  color: var(--accent-warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-slop {
+  background-color: var(--accent-danger-bg);
+  color: var(--accent-danger);
+  border: 1px solid var(--accent-danger-border);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--accent-primary);
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background-color: var(--accent-primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-card);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}
+.btn-secondary:hover {
+  background-color: var(--bg-card-hover);
+  border-color: #3b4e6b;
+}
+
+.btn-shield {
+  background-color: var(--accent-shield-bg);
+  border-color: var(--accent-shield-border);
+  color: var(--accent-shield);
+}
+.btn-shield:hover {
+  background-color: rgba(16, 185, 129, 0.22);
+}
+
+.btn-danger {
+  background-color: var(--accent-danger-bg);
+  border-color: var(--accent-danger-border);
+  color: var(--accent-danger);
+}
+.btn-danger:hover {
+  background-color: rgba(244, 63, 94, 0.22);
+}
+
+.btn-icon {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-icon:hover {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 12px rgba(16, 185, 129, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.45); }
+}
+
+.shield-pulse {
+  animation: pulseGlow 3s infinite ease-in-out;
+}
