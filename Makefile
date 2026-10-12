@@ -161,6 +161,20 @@ packages-all:
 	@./packaging/scripts/build-all.sh all
 
 # ------------------------------------------------------------------------------
+# Arch User Repository (AUR) Publishing
+# ------------------------------------------------------------------------------
+
+aur:
+	@echo "==> Updating AUR metadata..."
+	@makepkg --printsrcinfo > .SRCINFO
+	@mkdir -p packaging/aur
+	@cp PKGBUILD .SRCINFO packaging/aur/
+	@echo "==> AUR manifests synchronized: PKGBUILD, .SRCINFO"
+
+aur-push: aur
+	@./packaging/aur/push-aur.sh
+
+# ------------------------------------------------------------------------------
 # Quality Assurance & Cleaning
 # ------------------------------------------------------------------------------
 

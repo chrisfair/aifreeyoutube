@@ -1,12 +1,11 @@
 # Maintainer: Christopher Patrick Fair <christopherpatrickfair@gmail.com>
-# Contributor: AI-Free YouTube Project Maintainers
 
 pkgname=aifreeyoutube
 pkgver=1.0.0
 pkgrel=1
 pkgdesc="Authentic human video portal filtering out AI slop, clickbait mills, and bots on YouTube"
 arch=('x86_64')
-url="https://github.com/christopherpatrickfair/aifreeyoutube"
+url="https://github.com/chrisfair/aifreeyoutube"
 license=('GPL-3.0-or-later')
 depends=(
     'webkit2gtk-4.1'
@@ -21,33 +20,52 @@ makedepends=(
 )
 provides=('aifreeyoutube')
 conflicts=('aifreeyoutube')
-options=('!strip')
+
+source=("$pkgname-$pkgver.tar.gz::https://github.com/chrisfair/$pkgname/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('98ab559835efcf6db1f3e2a1ea1a549cccb3cd3b91c7c14d38bff322c3ba22af')
+
+prepare() {
+    cd "${srcdir}/${pkgname}-${pkgver}/frontend"
+    npm install
+}
 
 build() {
-    cd "$startdir"
-    
-    # Ensure wails CLI is discoverable in GOPATH if not in system PATH
-    export PATH="$PATH:$HOME/go/bin"
-    
-    echo "==> Building AI-Free YouTube Wails desktop application..."
-    wails build -tags webkit2_41 -clean
+    cd "${srcdir}/${pkgname}-${pkgver}"
+
+    export CGO_CPPFLAGS="${CPPFLAGS}"
+    export CGO_CFLAGS="${CFLAGS}"
+    export CGO_CXXFLAGS="${CXXFLAGS}"
+    export CGO_LDFLAGS="${LDFLAGS}"
+    export GOFLAGS="-buildmode=pie -trimpath -modcacherw"
+
+    # 1. Build frontend distribution assets
+    cd frontend && npm run build && cd ..
+
+    # 2. Build desktop application binary (WebKit2GTK 4.1)
+    go build -tags "desktop,production,webkit2_41" -ldflags "-s -w" -o "build/bin/${pkgname}" .
+
+    # 3. Build standalone background web server binary
+    go build -ldflags "-s -w" -o "build/bin/${pkgname}-server" ./cmd/server
 }
 
 package() {
-    cd "$startdir"
-    
-    # Install application binary
-    install -Dm755 "build/bin/aifreeyoutube" "$pkgdir/usr/bin/aifreeyoutube"
-    
-    # Install Freedesktop .desktop entry
-    install -Dm644 "build/linux/aifreeyoutube.desktop" "$pkgdir/usr/share/applications/aifreeyoutube.desktop"
-    
-    # Install scalable vector icon
-    install -Dm644 "build/appicon.svg" "$pkgdir/usr/share/icons/hicolor/scalable/apps/aifreeyoutube.svg"
-    
-    # Install high-resolution 512x512 raster icon
-    install -Dm644 "build/appicon.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/aifreeyoutube.png"
+    cd "${srcdir}/${pkgname}-${pkgver}"
+
+    # Install binaries
+    install -Dm755 "build/bin/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+    install -Dm755 "build/bin/${pkgname}-server" "${pkgdir}/usr/bin/${pkgname}-server"
+
+    # Install Freedesktop desktop launcher
+    install -Dm644 "build/linux/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+
+    # Install application icons
+    install -Dm644 "build/appicon.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
+    install -Dm644 "build/appicon.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${pkgname}.png"
+
+    # Install systemd service units
+    install -Dm644 "packaging/systemd/${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
+    install -Dm644 "packaging/systemd/${pkgname}-user.service" "${pkgdir}/usr/lib/systemd/user/${pkgname}.service"
 
     # Install license
-    install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
