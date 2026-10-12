@@ -33,6 +33,10 @@
 
             <!-- Creator Action Controls -->
             <div class="creator-actions">
+              <button @click="openExternal" class="btn btn-secondary btn-sm" title="Watch directly in system web browser">
+                <ExternalLink :size="15" />
+                <span>Open in Browser</span>
+              </button>
               <button @click="whitelistCurrentChannel" class="btn btn-secondary btn-sm">
                 <UserCheck :size="15" />
                 <span>Whitelist Creator</span>
@@ -159,6 +163,7 @@ import {
   AlertTriangle,
   UserCheck,
   Ban,
+  ExternalLink,
 } from 'lucide-vue-next';
 import VideoPlayer from '../components/VideoPlayer.vue';
 import { useFilterStore } from '../stores/filterStore';
@@ -197,6 +202,16 @@ async function loadVideoDetails(id) {
     console.error('Failed to load video details:', err);
   } finally {
     isLoading.value = false;
+  }
+}
+
+function openExternal() {
+  if (!video.value?.id) return;
+  const targetUrl = `https://www.youtube.com/watch?v=${video.value.id}`;
+  if (typeof window !== 'undefined' && window['go']?.['main']?.['App']?.['OpenInBrowser']) {
+    window['go']['main']['App']['OpenInBrowser'](targetUrl);
+  } else {
+    window.open(targetUrl, '_blank');
   }
 }
 

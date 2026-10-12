@@ -1,0 +1,21 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "aifreeyoutube",
+  "outputfilename": "aifreeyoutube",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "frontend:dir": "./frontend",
+  "author": {
+    "name": "Christopher Patrick Fair",
+    "email": "christopherpatrickfair@gmail.com"
+  },
+  "info": {
+    "companyName": "AI-Free YouTube",
+    "productName": "AI-Free YouTube",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright 2026 Christopher Patrick Fair",
+    "comments": "Authentic Human Content Portal for YouTube without AI slop"
+  }
+}

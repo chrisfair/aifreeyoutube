@@ -1,8 +1,12 @@
 # Binaries and build artifacts
 backend/server
+bin/
+build/bin/
 *.exe
 *.test
 *.out
+*.pkg.tar.zst
+frontend/package.json.md5
 
 # Frontend dependencies and builds
 frontend/node_modules/

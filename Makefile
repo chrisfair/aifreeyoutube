@@ -1,50 +1,92 @@
 # ==============================================================================
-# AI-Free YouTube: Authentic Human Content Portal
+# AI-Free YouTube: Arch Linux Desktop & Web Application
 # ==============================================================================
-# Makefile for building, testing, developing, and running the application.
+# Makefile for building, packaging, running, and installing the application.
 # ==============================================================================
 
-.PHONY: all build build-backend build-frontend run dev test clean help
+WAILS := $(shell which wails 2>/dev/null || echo $(HOME)/go/bin/wails)
+PREFIX ?= $(HOME)/.local
 
-# Default target
-all: build
+.PHONY: all desktop server build run run-server test install-desktop uninstall-desktop package-arch clean help
+
+# Default target: build native Arch Linux desktop application
+all: desktop
 
 help:
 	@echo "AI-Free YouTube - Available Commands:"
-	@echo "  make build          Build both Vue 3 frontend and Go backend"
-	@echo "  make build-backend  Compile Go backend binary (backend/server)"
-	@echo "  make build-frontend Build Vue 3 production bundle (frontend/dist)"
-	@echo "  make run            Start the standalone production server on http://localhost:8080"
-	@echo "  make test           Execute comprehensive Go test suite"
-	@echo "  make clean          Clean compiled binaries and build artifacts"
+	@echo "  make desktop           Build native Arch Linux Wails desktop app (build/bin/aifreeyoutube)"
+	@echo "  make run               Launch the native Wails desktop application"
+	@echo "  make install-desktop   Install desktop app, .desktop entry, and icons to $(PREFIX)"
+	@echo "  make uninstall-desktop Remove installed desktop app from $(PREFIX)"
+	@echo "  make package-arch      Build official Arch Linux package (.pkg.tar.zst) via makepkg"
+	@echo "  make server            Compile standalone Go web server (bin/aifreeyoutube-server)"
+	@echo "  make run-server        Launch standalone web server on http://localhost:8080"
+	@echo "  make test              Execute comprehensive Go unit test suite"
+	@echo "  make clean             Clean compiled binaries and build caches"
 
-# Build Vue 3 frontend and Go backend
-build: build-frontend build-backend
-	@echo "==> Build complete! Run 'make run' to launch the server on http://localhost:8080"
+# ------------------------------------------------------------------------------
+# Arch Linux Desktop Application (Wails v2 + WebKit2GTK 4.1)
+# ------------------------------------------------------------------------------
 
-# Build Vue 3 static distribution files
-build-frontend:
-	@echo "==> Building Vue 3 frontend..."
+desktop:
+	@echo "==> Building Arch Linux native desktop application..."
 	cd frontend && npm run build
+	$(WAILS) build -tags webkit2_41
+	@echo "==> Desktop build complete: build/bin/aifreeyoutube"
 
-# Compile Go backend server binary
-build-backend:
-	@echo "==> Compiling Go backend binary..."
-	cd backend && go build -o server ./cmd/server
+run: desktop
+	@echo "==> Launching AI-Free YouTube desktop application..."
+	./build/bin/aifreeyoutube
 
-# Run the unified Go server (serves API and embedded frontend SPA)
-run: build
-	@echo "==> Launching AI-Free YouTube server on http://localhost:8080..."
-	./backend/server
+install-desktop: desktop
+	@echo "==> Installing AI-Free YouTube to $(PREFIX)..."
+	install -Dm755 build/bin/aifreeyoutube $(PREFIX)/bin/aifreeyoutube
+	install -Dm644 build/linux/aifreeyoutube.desktop $(PREFIX)/share/applications/aifreeyoutube.desktop
+	install -Dm644 build/appicon.svg $(PREFIX)/share/icons/hicolor/scalable/apps/aifreeyoutube.svg
+	install -Dm644 build/appicon.png $(PREFIX)/share/icons/hicolor/512x512/apps/aifreeyoutube.png
+	@which update-desktop-database >/dev/null 2>&1 && update-desktop-database $(PREFIX)/share/applications || true
+	@echo "==> Installation complete! You can now launch 'AI-Free YouTube' from your application menu or terminal."
 
-# Execute unit tests with verbose logging
+uninstall-desktop:
+	@echo "==> Uninstalling AI-Free YouTube from $(PREFIX)..."
+	rm -f $(PREFIX)/bin/aifreeyoutube
+	rm -f $(PREFIX)/share/applications/aifreeyoutube.desktop
+	rm -f $(PREFIX)/share/icons/hicolor/scalable/apps/aifreeyoutube.svg
+	rm -f $(PREFIX)/share/icons/hicolor/512x512/apps/aifreeyoutube.png
+	@which update-desktop-database >/dev/null 2>&1 && update-desktop-database $(PREFIX)/share/applications || true
+	@echo "==> Uninstalled successfully."
+
+package-arch:
+	@echo "==> Building Arch Linux package via makepkg..."
+	makepkg -f
+
+# ------------------------------------------------------------------------------
+# Standalone Web Server
+# ------------------------------------------------------------------------------
+
+server:
+	@echo "==> Compiling standalone Go web server..."
+	cd frontend && npm run build
+	mkdir -p bin
+	go build -o bin/aifreeyoutube-server ./cmd/server
+	@echo "==> Web server binary compiled: bin/aifreeyoutube-server"
+
+run-server: server
+	@echo "==> Launching standalone web server on http://localhost:8080..."
+	./bin/aifreeyoutube-server
+
+# ------------------------------------------------------------------------------
+# Quality Assurance & Cleaning
+# ------------------------------------------------------------------------------
+
 test:
-	@echo "==> Running backend test suite..."
-	cd backend && go test -v ./...
+	@echo "==> Running test suite..."
+	go test -v ./...
 
-# Remove build artifacts
 clean:
 	@echo "==> Cleaning build artifacts..."
-	rm -f backend/server
+	rm -rf build/bin
+	rm -rf bin
 	rm -rf frontend/dist
+	rm -f *.pkg.tar.zst
 	@echo "==> Clean complete."

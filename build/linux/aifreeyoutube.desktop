@@ -1,0 +1,18 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=AI-Free YouTube
+GenericName=Authentic Video Portal
+Comment=Watch YouTube content filtered of AI slop, clickbait mills, and bots
+Exec=aifreeyoutube %U
+Icon=aifreeyoutube
+Terminal=false
+Categories=AudioVideo;Video;Network;Player;
+Keywords=youtube;video;filter;ai;streaming;privacy;human;
+StartupNotify=true
+StartupWMClass=aifreeyoutube
+Actions=Trending;
+
+[Desktop Action Trending]
+Name=Trending Authentic Videos
+Exec=aifreeyoutube
