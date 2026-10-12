@@ -15,8 +15,9 @@ depends=(
     'hicolor-icon-theme'
 )
 makedepends=(
-    'go>=1.22'
-    'npm>=18'
+    'go'
+    'nodejs'
+    'npm'
 )
 provides=('aifreeyoutube')
 conflicts=('aifreeyoutube')

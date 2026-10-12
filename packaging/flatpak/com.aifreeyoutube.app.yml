@@ -1,0 +1,61 @@
+# ==============================================================================
+# Flatpak Manifest for AI-Free YouTube
+# ==============================================================================
+# ID: com.aifreeyoutube.app
+# Build command:
+#   flatpak-builder --user --install --force-clean build-dir packaging/flatpak/com.aifreeyoutube.app.yml
+# ==============================================================================
+
+app-id: com.aifreeyoutube.app
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+command: aifreeyoutube
+
+finish-args:
+  # Network access for YouTube Innertube API and video streaming
+  - --share=network
+  - --share=ipc
+
+  # Display server support (both Wayland and X11)
+  - --socket=wayland
+  - --socket=fallback-x11
+
+  # Audio playback for video streams
+  - --socket=pulseaudio
+
+  # Direct Rendering Infrastructure (DRI) for GPU hardware acceleration
+  - --device=dri
+
+  # Desktop notifications and system URL opening
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.freedesktop.portal.OpenURI
+
+  # Environment tuning for WebKit2GTK on Wayland
+  - --env=WEBKIT_DISABLE_DMABUF_RENDERER=1
+
+modules:
+  - name: aifreeyoutube
+    buildsystem: simple
+    build-commands:
+      # Install desktop binary
+      - install -Dm755 aifreeyoutube /app/bin/aifreeyoutube
+      - install -Dm755 aifreeyoutube-server /app/bin/aifreeyoutube-server
+
+      # Install Freedesktop desktop launcher
+      - install -Dm644 aifreeyoutube.desktop /app/share/applications/com.aifreeyoutube.app.desktop
+
+      # Install icons
+      - install -Dm644 appicon.svg /app/share/icons/hicolor/scalable/apps/com.aifreeyoutube.app.svg
+      - install -Dm644 appicon.png /app/share/icons/hicolor/512x512/apps/com.aifreeyoutube.app.png
+    sources:
+      - type: file
+        path: ../../build/bin/aifreeyoutube
+      - type: file
+        path: ../../bin/aifreeyoutube-server
+      - type: file
+        path: ../../build/linux/aifreeyoutube.desktop
+      - type: file
+        path: ../../build/appicon.svg
+      - type: file
+        path: ../../build/appicon.png

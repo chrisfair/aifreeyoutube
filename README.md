@@ -342,6 +342,84 @@ make test
 
 ---
 
+## Universal Cross-Platform Packaging & Systemd
+
+AI-Free YouTube supports automated packaging for all major desktop platforms and Linux package formats.
+
+### 1. Systemd Service Integration
+- **User Service (Recommended for desktop users)**:
+  ```bash
+  make service-start     # Enables and starts service for your desktop user
+  make service-status    # Inspect live status
+  make service-stop      # Stop background service
+  ```
+  *Accessible at `http://localhost:8484` continuously, auto-starting on login.*
+- **Hardened System-wide Service**:
+  ```bash
+  make systemd-install   # Installs to /etc/systemd/system/aifreeyoutube.service
+  ```
+
+### 2. Linux Distribution Packages
+- **Debian / Ubuntu (`.deb`)**:
+  ```bash
+  make deb
+  # Generated in build/dist/aifreeyoutube_1.0.0_amd64.deb
+  sudo dpkg -i build/dist/aifreeyoutube_1.0.0_amd64.deb
+  ```
+- **Red Hat / Fedora / openSUSE (`.rpm`)**:
+  ```bash
+  make rpm
+  # Generated in build/dist/aifreeyoutube-1.0.0-1.x86_64.rpm
+  ```
+- **Linux Universal AppImage**:
+  ```bash
+  make appimage
+  # Standalone single-file executable: build/dist/aifreeyoutube-1.0.0-x86_64.AppImage
+  ./build/dist/aifreeyoutube-1.0.0-x86_64.AppImage
+  ```
+- **Flatpak**:
+  ```bash
+  make flatpak
+  # Manifest at packaging/flatpak/com.aifreeyoutube.app.yml
+  flatpak-builder --user --install --force-clean build/flatpak-build packaging/flatpak/com.aifreeyoutube.app.yml
+  ```
+- **Canonical Snap**:
+  ```bash
+  make snap
+  # Recipe at packaging/snap/snapcraft.yaml
+  ```
+
+### 3. Windows (Executables, ZIP & Chocolatey)
+- **Windows 64-bit Bundle**:
+  ```bash
+  make windows
+  # Generates build/dist/aifreeyoutube-v1.0.0-windows-amd64.zip containing aifreeyoutube-server.exe & batch launcher
+  ```
+- **Chocolatey Package**:
+  - Manifest: [`packaging/windows/chocolatey/aifreeyoutube.nuspec`](file:///home/christopher/Projects/aifreeyoutube/packaging/windows/chocolatey/aifreeyoutube.nuspec)
+  - Install Script: [`packaging/windows/chocolatey/tools/chocolateyinstall.ps1`](file:///home/christopher/Projects/aifreeyoutube/packaging/windows/chocolatey/tools/chocolateyinstall.ps1)
+  - Uninstall Script: [`packaging/windows/chocolatey/tools/chocolateyuninstall.ps1`](file:///home/christopher/Projects/aifreeyoutube/packaging/windows/chocolatey/tools/chocolateyuninstall.ps1)
+  - Build command: `cd packaging/windows/chocolatey && choco pack`
+
+### 4. macOS (Apple Silicon, Intel & Homebrew)
+- **macOS Binaries & Tarballs**:
+  ```bash
+  make macos
+  # Generates build/dist/aifreeyoutube-v1.0.0-darwin-arm64.tar.gz (Apple Silicon M1/M2/M3/M4)
+  # Generates build/dist/aifreeyoutube-v1.0.0-darwin-amd64.tar.gz (Intel Mac)
+  ```
+- **Homebrew Formula**:
+  - Located at: [`packaging/macos/homebrew/aifreeyoutube.rb`](file:///home/christopher/Projects/aifreeyoutube/packaging/macos/homebrew/aifreeyoutube.rb)
+  - Supports `brew install` and background daemon management via `brew services start aifreeyoutube`.
+
+### 5. Build Everything in One Command
+```bash
+make packages-all
+```
+Assembles all distribution artifacts into `build/dist/`.
+
+---
+
 ## Privacy & Tracking Protection
 
 Unlike standard YouTube web clients, AI-Free YouTube enforces strict client privacy:

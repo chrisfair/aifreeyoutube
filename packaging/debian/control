@@ -1,0 +1,15 @@
+Package: aifreeyoutube
+Version: 1.0.0
+Section: video
+Priority: optional
+Architecture: amd64
+Maintainer: Christopher Patrick Fair <christopherpatrickfair@gmail.com>
+Depends: libwebkit2gtk-4.1-0 | libwebkit2gtk-4.0-37, libgtk-3-0, libc6 (>= 2.34)
+Recommends: hicolor-icon-theme, xdg-utils
+Homepage: https://github.com/christopherpatrickfair/aifreeyoutube
+Description: Authentic human video portal filtering out AI slop on YouTube
+ AI-Free YouTube transparently intercepts and filters YouTube search and trending
+ content using an explainable, multi-signal heuristic engine. It quarantines
+ automated ChatGPT scripts, synthetic voiceover content mills, and clickbait
+ alarmism formulas, delivering an authentic human viewing experience.
+ Supports both native WebKit2GTK desktop windows and local web server mode.

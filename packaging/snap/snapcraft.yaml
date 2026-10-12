@@ -1,0 +1,76 @@
+# ==============================================================================
+# Canonical Snapcraft Packaging Recipe for AI-Free YouTube
+# ==============================================================================
+# Build command:
+#   cd packaging/snap && snapcraft
+# Install locally:
+#   sudo snap install --dangerous aifreeyoutube_1.0.0_amd64.snap
+# ==============================================================================
+
+name: aifreeyoutube
+base: core22
+version: '1.0.0'
+summary: Authentic human video portal filtering out AI slop on YouTube
+description: |
+  AI-Free YouTube transparently intercepts and filters YouTube search and trending
+  content using an explainable, multi-signal heuristic engine. It quarantines
+  automated ChatGPT scripts, synthetic voiceover content mills, and clickbait
+  alarmism formulas, delivering an authentic human viewing experience.
+  Supports both native WebKit2GTK desktop windows and local web server mode.
+
+grade: stable
+confinement: strict
+
+architectures:
+  - build-on: amd64
+
+apps:
+  # Native Desktop Application
+  aifreeyoutube:
+    command: usr/bin/aifreeyoutube
+    extensions: [gnome]
+    common-id: com.aifreeyoutube.app
+    environment:
+      WEBKIT_DISABLE_DMABUF_RENDERER: "1"
+    plugs:
+      - network
+      - network-status
+      - audio-playback
+      - opengl
+      - desktop
+      - desktop-legacy
+      - wayland
+      - x11
+      - home
+
+  # Standalone Background Web Server Service
+  server:
+    command: usr/bin/aifreeyoutube-server
+    daemon: simple
+    restart-condition: on-failure
+    plugs:
+      - network
+      - network-bind
+    environment:
+      PORT: "8484"
+
+parts:
+  desktop-app:
+    plugin: dump
+    source: ../../build/bin
+    organize:
+      aifreeyoutube: usr/bin/aifreeyoutube
+
+  web-server:
+    plugin: dump
+    source: ../../bin
+    organize:
+      aifreeyoutube-server: usr/bin/aifreeyoutube-server
+
+  desktop-assets:
+    plugin: dump
+    source: ../../build
+    organize:
+      linux/aifreeyoutube.desktop: usr/share/applications/aifreeyoutube.desktop
+      appicon.svg: usr/share/icons/hicolor/scalable/apps/aifreeyoutube.svg
+      appicon.png: usr/share/icons/hicolor/512x512/apps/aifreeyoutube.png

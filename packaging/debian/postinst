@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+# Update MIME and Desktop application caches
+if which update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database -q /usr/share/applications || true
+fi
+
+# Update Hicolor icon theme cache
+if which gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor || true
+fi
+
+# Reload systemd daemon if active
+if which systemctl >/dev/null 2>&1 && systemctl is-system-running >/dev/null 2>&1; then
+    systemctl daemon-reload || true
+fi
+
+exit 0

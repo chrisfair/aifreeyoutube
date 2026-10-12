@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# AI-Free YouTube: AppImage Entrypoint (AppRun)
+# ==============================================================================
+set -e
+
+# Resolve the directory where this AppImage is currently mounted
+APPDIR="$(dirname "$(readlink -f "${0}")")"
+
+export PATH="${APPDIR}/usr/bin:${PATH}"
+export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${LD_LIBRARY_PATH:-}"
+export XDG_DATA_DIRS="${APPDIR}/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+
+# Ensure Wayland compatibility for WebKit2GTK on NVIDIA / Hyprland
+if [ -z "${WEBKIT_DISABLE_DMABUF_RENDERER:-}" ]; then
+    export WEBKIT_DISABLE_DMABUF_RENDERER=1
+fi
+
+# Execute native desktop application with all forwarded arguments
+exec "${APPDIR}/usr/bin/aifreeyoutube" "$@"

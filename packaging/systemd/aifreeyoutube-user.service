@@ -1,0 +1,32 @@
+# ==============================================================================
+# AI-Free YouTube: Systemd User Service
+# ==============================================================================
+# This unit file runs AI-Free YouTube as a personal user service, starting
+# automatically upon user login without requiring root / sudo permissions.
+#
+# Installation:
+#   mkdir -p ~/.config/systemd/user
+#   cp packaging/systemd/aifreeyoutube-user.service ~/.config/systemd/user/aifreeyoutube.service
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now aifreeyoutube
+#
+# Check Status & Logs:
+#   systemctl --user status aifreeyoutube
+#   journalctl --user -u aifreeyoutube -f
+# ==============================================================================
+
+[Unit]
+Description=AI-Free YouTube User Web Service
+Documentation=https://github.com/christopherpatrickfair/aifreeyoutube
+After=default.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Projects/aifreeyoutube
+ExecStart=%h/Projects/aifreeyoutube/bin/aifreeyoutube-server
+Restart=on-failure
+RestartSec=3s
+Environment=PORT=8484
+
+[Install]
+WantedBy=default.target

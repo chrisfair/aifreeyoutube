@@ -1,0 +1,68 @@
+# ==============================================================================
+# AI-Free YouTube: Systemd System Service
+# ==============================================================================
+# This unit file runs AI-Free YouTube as a production, hardened system-wide
+# daemon managed by systemd on Debian, Ubuntu, Fedora, RHEL, Arch, and SUSE.
+#
+# Installation:
+#   sudo cp packaging/systemd/aifreeyoutube.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now aifreeyoutube
+#
+# Logs:
+#   journalctl -u aifreeyoutube -f
+# ==============================================================================
+
+[Unit]
+Description=AI-Free YouTube Core Engine & Web Portal
+Documentation=https://github.com/christopherpatrickfair/aifreeyoutube
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aifreeyoutube
+Group=aifreeyoutube
+
+# Default working directory and binary location
+WorkingDirectory=/var/lib/aifreeyoutube
+ExecStart=/usr/bin/aifreeyoutube-server
+
+# Configuration environment
+Environment=PORT=8484
+EnvironmentFile=-/etc/default/aifreeyoutube
+EnvironmentFile=-/etc/sysconfig/aifreeyoutube
+
+# Automatic restart on failure with rate limiting
+Restart=on-failure
+RestartSec=5s
+StartLimitIntervalSec=60s
+StartLimitBurst=5
+
+# ------------------------------------------------------------------------------
+# Security Hardening Directives
+# ------------------------------------------------------------------------------
+# Prevent privilege escalation
+NoNewPrivileges=true
+
+# Restrict filesystem access: system directories are read-only
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/aifreeyoutube /var/log/aifreeyoutube
+
+# Isolated /tmp directory not shared with other processes
+PrivateTmp=true
+
+# Restrict access to kernel tunables and control groups
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+
+# Restrict realtime process scheduling to prevent denial-of-service
+RestrictRealtime=true
+
+# Block raw socket creation (Go standard HTTP uses standard TCP sockets)
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

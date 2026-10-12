@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>aifreeyoutube</id>
+    <version>1.0.0</version>
+    <packageSourceUrl>https://github.com/christopherpatrickfair/aifreeyoutube</packageSourceUrl>
+    <owners>Christopher Patrick Fair</owners>
+    <title>AI-Free YouTube</title>
+    <authors>Christopher Patrick Fair</authors>
+    <projectUrl>https://github.com/christopherpatrickfair/aifreeyoutube</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/christopherpatrickfair/aifreeyoutube/main/build/appicon.png</iconUrl>
+    <copyright>Copyright 2026 Christopher Patrick Fair</copyright>
+    <licenseUrl>https://github.com/christopherpatrickfair/aifreeyoutube/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/christopherpatrickfair/aifreeyoutube</projectSourceUrl>
+    <docsUrl>https://github.com/christopherpatrickfair/aifreeyoutube/blob/main/README.md</docsUrl>
+    <bugTrackerUrl>https://github.com/christopherpatrickfair/aifreeyoutube/issues</bugTrackerUrl>
+    <tags>aifreeyoutube youtube video filter ai-detector ad-free privacy wails</tags>
+    <summary>Authentic human video portal filtering out AI slop, clickbait mills, and bots on YouTube</summary>
+    <description><![CDATA[
+# AI-Free YouTube
+
+**AI-Free YouTube** is a lightweight, high-performance desktop and web application that transparently filters YouTube content through a multi-signal heuristic engine to eliminate AI-generated slop, synthetic voiceover content mills, and algorithmic clickbait.
+
+## Features
+- **Explainable AI Shield**: Instant human authenticity rating on every video with granular signal inspection.
+- **YouTube Premium Integration**: Option to share browser session cookies for 100% ad-free playback.
+- **Zero API Quota Dependency**: Communicates directly via YouTube's internal Innertube engine.
+- **Privacy First**: All video playback routed cleanly without third-party ad telemetry.
+    ]]></description>
+    <releaseNotes>https://github.com/christopherpatrickfair/aifreeyoutube/releases/tag/v1.0.0</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

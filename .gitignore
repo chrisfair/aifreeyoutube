@@ -2,10 +2,22 @@
 backend/server
 bin/
 build/bin/
+build/dist/
+build/AppDir/
+build/deb-staging/
+build/rpm/
+build/windows-staging*
+build/macos-staging*
+build/flatpak-*
+build/appimagetool*
 *.exe
 *.test
 *.out
-*.pkg.tar.zst
+*.deb
+*.rpm
+*.AppImage
+*.nupkg
+*.pkg.tar.*
 frontend/package.json.md5
 
 # Frontend dependencies and builds
