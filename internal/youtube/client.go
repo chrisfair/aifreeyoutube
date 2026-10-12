@@ -45,12 +45,12 @@ func (s *Service) Search(ctx context.Context, query string) ([]models.Video, err
 
 // BrowseHome fetches the default clean discovery home feed.
 func (s *Service) BrowseHome(ctx context.Context) ([]models.Video, error) {
-	return s.Search(ctx, "popular")
+	return s.Search(ctx, "popular documentary science craftsmanship")
 }
 
-// BrowseTrending queries YouTube's trending now feed.
+// BrowseTrending queries YouTube's trending discovery feed.
 func (s *Service) BrowseTrending(ctx context.Context) ([]models.Video, error) {
-	return s.Search(ctx, "trending now")
+	return s.Search(ctx, "trending documentary science technology craftsmanship")
 }
 
 // GetVideoDetails retrieves the metadata for a specific video ID alongside its related recommendations.

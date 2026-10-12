@@ -10,17 +10,17 @@ import (
 )
 
 const (
-	// PresetAggressiveThreshold is the strict cutoff (35% AI score).
-	// Suitable for users who want zero tolerance for synthetic scripts, stock voiceovers, or clickbait.
-	PresetAggressiveThreshold = 0.35
+	// PresetAggressiveThreshold is the strict cutoff (30% AI score).
+	// Suitable for users who want zero tolerance for synthetic scripts, stock voiceovers, listicles, or clickbait.
+	PresetAggressiveThreshold = 0.30
 
-	// PresetBalancedThreshold is the default cutoff (55% AI score).
-	// Accurately intercepts obvious AI content farms while preserving authentic human creators discussing technology.
-	PresetBalancedThreshold = 0.55
+	// PresetBalancedThreshold is the default cutoff (45% AI score).
+	// Accurately intercepts AI tools, cash cows, reddit TTS farms, fake science, and content mills.
+	PresetBalancedThreshold = 0.45
 
-	// PresetMildThreshold is the conservative cutoff (75% AI score).
-	// Only blocks blatant, automated spam mills with multiple high-confidence triggers.
-	PresetMildThreshold = 0.75
+	// PresetMildThreshold is the conservative cutoff (65% AI score).
+	// Blocks blatant automated spam mills and explicit AI generation disclosures.
+	PresetMildThreshold = 0.65
 )
 
 // ConfigManager maintains runtime filter preferences in a thread-safe manner,

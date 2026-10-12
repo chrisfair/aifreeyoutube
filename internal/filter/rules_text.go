@@ -3,6 +3,7 @@ package filter
 import (
 	"regexp"
 	"strings"
+	"unicode"
 
 	"aifreeyoutube/internal/models"
 )
@@ -14,127 +15,195 @@ type LexicalRule struct {
 	Description string
 }
 
-// LLMPhrases lists distinctive words and clichés statistically overrepresented in LLM-generated output
-// (e.g., standard ChatGPT prose defaults).
-var LLMPhrases = []LexicalRule{
-	{"delve into", 0.35, "Characteristic LLM prose marker ('delve into')"},
-	{"delving into", 0.35, "Characteristic LLM prose marker ('delving into')"},
-	{"in today's fast-paced world", 0.40, "Formulaic ChatGPT opening cliché"},
-	{"in today's digital landscape", 0.40, "Formulaic ChatGPT opening cliché"},
-	{"in today's digital world", 0.35, "Formulaic ChatGPT opening cliché"},
-	{"tapestry of", 0.45, "Distinctive LLM metaphorical cliché ('tapestry of')"},
-	{"testament to", 0.35, "Distinctive LLM essay phrasing ('testament to')"},
-	{"beacon of", 0.35, "Distinctive LLM stock expression ('beacon of')"},
-	{"game-changer", 0.25, "Overused synthetic marketing buzzword ('game-changer')"},
-	{"game changer", 0.25, "Overused synthetic marketing buzzword ('game changer')"},
-	{"revolutionize the way", 0.30, "Automated hype phrase ('revolutionize the way')"},
-	{"unleash the power", 0.30, "Synthetic promotion phrasing ('unleash the power')"},
-	{"look no further", 0.30, "Stock marketing script filler ('look no further')"},
-	{"without further ado", 0.25, "Scripted filler introduction ('without further ado')"},
-	{"embark on a journey", 0.35, "Formulaic robotic narrative opening ('embark on a journey')"},
-	{"fascinating journey into", 0.35, "Formulaic robotic narration ('fascinating journey into')"},
-	{"navigating the complexities", 0.35, "Standard LLM essay trope ('navigating the complexities')"},
-	{"vital role in shaping", 0.30, "Academic-sounding automated filler ('vital role in shaping')"},
-	{"take your productivity to the next level", 0.35, "Automated tech influencer script template"},
-	{"in this comprehensive guide", 0.30, "Formulaic tutorial script header"},
-	{"it's crucial to remember", 0.35, "ChatGPT ethical hedge phrasing ('crucial to remember')"},
-	{"it is important to note", 0.30, "ChatGPT hedge formula ('important to note')"},
-	{"step-by-step blueprint", 0.25, "Automated course/affiliate farm template"},
-}
-
-// ClickbaitFormulaRule associates a compiled regular expression with a weight and diagnostic explanation.
-type ClickbaitFormulaRule struct {
+// RegexRule associates a pre-compiled regular expression with a weight and diagnostic explanation.
+type RegexRule struct {
 	Regex       *regexp.Regexp
 	Weight      float64
+	Confidence  float64
+	Category    string
 	Name        string
 	Description string
 }
 
-// FormulaRules defines regex templates characteristic of automated faceless video factories.
-var FormulaRules = []ClickbaitFormulaRule{
+// LLMPhrases lists distinctive words and clichés statistically overrepresented in LLM-generated output
+var LLMPhrases = []LexicalRule{
+	{"delve into", 0.45, "Characteristic LLM prose marker ('delve into')"},
+	{"delving into", 0.45, "Characteristic LLM prose marker ('delving into')"},
+	{"in today's fast-paced world", 0.50, "Formulaic ChatGPT opening cliché"},
+	{"in today's digital landscape", 0.50, "Formulaic ChatGPT opening cliché"},
+	{"in today's digital world", 0.45, "Formulaic ChatGPT opening cliché"},
+	{"tapestry of", 0.50, "Distinctive LLM metaphorical cliché ('tapestry of')"},
+	{"testament to", 0.40, "Distinctive LLM essay phrasing ('testament to')"},
+	{"beacon of", 0.40, "Distinctive LLM stock expression ('beacon of')"},
+	{"game-changer", 0.35, "Overused synthetic marketing buzzword ('game-changer')"},
+	{"game changer", 0.35, "Overused synthetic marketing buzzword ('game changer')"},
+	{"revolutionize the way", 0.40, "Automated hype phrase ('revolutionize the way')"},
+	{"unleash the power", 0.40, "Synthetic promotion phrasing ('unleash the power')"},
+	{"look no further", 0.35, "Stock marketing script filler ('look no further')"},
+	{"without further ado", 0.35, "Scripted filler introduction ('without further ado')"},
+	{"embark on a journey", 0.45, "Formulaic robotic narrative opening ('embark on a journey')"},
+	{"fascinating journey into", 0.45, "Formulaic robotic narration ('fascinating journey into')"},
+	{"navigating the complexities", 0.45, "Standard LLM essay trope ('navigating the complexities')"},
+	{"vital role in shaping", 0.40, "Academic-sounding automated filler ('vital role in shaping')"},
+	{"take your productivity to the next level", 0.45, "Automated tech influencer script template"},
+	{"in this comprehensive guide", 0.40, "Formulaic tutorial script header"},
+	{"it's crucial to remember", 0.45, "ChatGPT ethical hedge phrasing ('crucial to remember')"},
+	{"it is important to note", 0.40, "ChatGPT hedge formula ('important to note')"},
+	{"step-by-step blueprint", 0.35, "Automated course/affiliate farm template"},
+}
+
+// RegexDetectionRules defines high-precision regex templates capturing modern AI video content mills.
+var RegexDetectionRules = []RegexRule{
+	// 1. Explicit Generative AI Disclosures & Tools
 	{
-		Regex:       regexp.MustCompile(`(?i)\bwhy nobody is talking about\b`),
-		Weight:      0.40,
-		Name:        "Formula: Why Nobody Is Talking About",
+		Regex:       regexp.MustCompile(`(?i)\b(chatgpt|gpt-?4o?|gpt-?3\.?5|claude(\s*3(\.5)?)?|midjourney|dall-?e(\s*[23])?|sora\b|elevenlabs|runwayml|stable\s*diffusion|suno(\s*ai)?|udio(\s*ai)?|deepseek|flux\.1|gemini\s*ai|genai|synthesia|heygen)\b`),
+		Weight:      0.90,
+		Confidence:  0.95,
+		Category:    "lexical",
+		Name:        "Explicit AI Tool Mention",
+		Description: "Title or metadata explicitly references generative AI tools (ChatGPT, Midjourney, ElevenLabs, etc.)",
+	},
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(ai generated|ai animation|ai art|ai music|ai song|ai cover|ai voice|ai narration|text-to-speech|\btts\b|voice clone|voice cloning|synthetic voice|ai deepfake|ai wrote this|generated by ai|created (with|using) ai|made with ai|voice by elevenlabs|ai avatar|ai bot|ai model|ai influencer)\b`),
+		Weight:      0.90,
+		Confidence:  0.95,
+		Category:    "metadata",
+		Name:        "Synthetic Media Disclosure",
+		Description: "Content explicitly flagged or described as synthetic/AI-generated media",
+	},
+
+	// 2. Faceless Content Mill & AI Cash Cow Schemes
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(faceless (youtube|channel|video|business|tiktok|shorts)|youtube automation|cash cow (channel|video)|automated channel|automated video|automated youtube)\b`),
+		Weight:      0.85,
+		Confidence:  0.95,
+		Category:    "formula",
+		Name:        "Faceless Automation Farm",
+		Description: "Promotes or operates an automated faceless channel factory",
+	},
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(make money with (ai|chatgpt|claude)|passive income (with|using) (ai|chatgpt)|copy paste (video|method|work)|earn \$\d+.*with ai|how to make \$\d+.*(day|month|week)|easiest side hustle|secret ai (website|tool|hack)|lazy way to (make|earn)|autopilot income)\b`),
+		Weight:      0.85,
+		Confidence:  0.90,
+		Category:    "formula",
+		Name:        "AI Money / Cash Cow Scheme",
+		Description: "Formulaic get-rich-quick promise engineered around AI tools and passive income",
+	},
+
+	// 3. Reddit Scraping & Text-To-Speech Farms
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(r\/(askreddit|aita|tifu|relationship_advice|nosleep|maliciouscompliance|prorevenge|entitledparents)|reddit stories|reddit tales|top reddit posts)\b`),
+		Weight:      0.80,
+		Confidence:  0.95,
+		Category:    "formula",
+		Name:        "Reddit Scraping TTS Mill",
+		Description: "Automated scraper channel reading Reddit threads with synthetic robotic narration",
+	},
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(aita for|tifu by|entitled (parents|people|mother|father|coworker|karen)|instant karma stories|he didn'?t know he was being recorded|she didn'?t realize what was happening)\b`),
+		Weight:      0.75,
+		Confidence:  0.90,
+		Category:    "formula",
+		Name:        "Automated Drama / Karma Story Formula",
+		Description: "Formulaic text-to-speech drama / entitled person script template",
+	},
+
+	// 4. Hallucinated Fake Science & Catastrophic Space Clickbait
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(james webb (telescope )?just (detected|found|spotted|revealed|saw|confirmed)|nasa just (found|detected|announced|revealed|warned|confirmed)|scientists (are terrified|just panicked|can'?t explain|warn humanity|made a terrifying discovery|are baffled))\b`),
+		Weight:      0.80,
+		Confidence:  0.90,
+		Category:    "formula",
+		Name:        "Fake Science / Space Alarmism",
+		Description: "Hallucinated alarmist science claim typical of automated stock-footage factories",
+	},
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(something (terrifying|is happening|just emerged|was found) (in space|under the ice|in antarctica|inside the ocean|on mars|deep inside)|what they found (inside|in the ocean|underneath|will terrify you)|the terrifying (truth|secret|reality) (about|behind)|before it hits earth|earth is in danger)\b`),
+		Weight:      0.75,
+		Confidence:  0.85,
+		Category:    "formula",
+		Name:        "Catastrophic Fear Clickbait",
+		Description: "Extreme hyperbolic conspiracy or terror formula designed for algorithmic feed manipulation",
+	},
+
+	// 5. AI Movie & Anime Recap Mills
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(movie recap|film recap|anime recap|cinema recap|story recap|plot explained in \d+ minutes?|recapped in \d+ minutes?)\b`),
+		Weight:      0.75,
+		Confidence:  0.90,
+		Category:    "formula",
+		Name:        "Movie/Anime Recap Content Mill",
+		Description: "Automated robotic narration synopsis channel reading Wikipedia plot summaries",
+	},
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(man gets trapped in a|boy wakes up in a world where|she thought he was just a|nobody knew he was actually|she had no idea who he was)\b`),
+		Weight:      0.70,
+		Confidence:  0.85,
+		Category:    "formula",
+		Name:        "Stock Story Hook Formula",
+		Description: "Formulaic third-person synopsis hook engineered for faceless recap mills",
+	},
+
+	// 6. Numbered Fact / Listicle Trivia Farms
+	{
+		Regex:       regexp.MustCompile(`(?i)\b\d+\s+(rare|crazy|shocking|weird|creepy|strange|interesting|unbelievable|mind-blowing|terrifying|hidden|dark|unknown|unsolved|mysterious|banned|forbidden)?\s*(history facts|facts|things|moments|secrets|mysteries|discoveries|inventions|places|photos|myths|stories|rules|hacks|reasons|questions)\b`),
+		Weight:      0.65,
+		Confidence:  0.85,
+		Category:    "formula",
+		Name:        "Numbered Fact / Listicle Mill",
+		Description: "Formulaic listicle template common in automated trivia and fact scrapers",
+	},
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(facts that will (blow your mind|keep you awake|terrify you|change how you think)|facts you (didn'?t know|never heard of|weren'?t taught))\b`),
+		Weight:      0.65,
+		Confidence:  0.85,
+		Category:    "formula",
+		Name:        "Hyperbolic Fact Claim",
+		Description: "Stock trivia hook typical of automated stock-video mills",
+	},
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(dark psychology (tricks|secrets|tactics|hacks)|how to manipulate|psychology facts (about|that)|stoic (quotes|lessons|wisdom|mindset|habits)|marcus aurelius (quotes|lessons|rules)|how to be dangerous|sigma (male|rule|grindset)|alpha male (habits|rules))\b`),
+		Weight:      0.70,
+		Confidence:  0.85,
+		Category:    "formula",
+		Name:        "Dark Psychology / Sigma Grindset Slop",
+		Description: "Automated motivational quote / sigma male / dark psychology content farm",
+	},
+
+	// 7. Synthetic Brainrot & Meme Slop
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(skibidi( toilet)?|grimace shake|baby gronk|ohio meme|gigachad|smurf cat|digital circus|tungsten cube|hydraulic press vs)\b`),
+		Weight:      0.85,
+		Confidence:  0.95,
+		Category:    "lexical",
+		Name:        "Synthetic Brainrot Slop",
+		Description: "High-volume algorithmic meme slop and automated trend-chasing content",
+	},
+
+	// 8. Hyperbolic Clickbait Formulae
+	{
+		Regex:       regexp.MustCompile(`(?i)\b(why nobody (is|wants to)?\s*talk(s|ing)? about|why no one talks about|what nobody tells you about)\b`),
+		Weight:      0.65,
+		Confidence:  0.90,
+		Category:    "formula",
+		Name:        "Formula: Why Nobody Talks About",
 		Description: "Formulaic conspiracy/fear clickbait template engineered for automated channels",
 	},
 	{
-		Regex:       regexp.MustCompile(`(?i)\bscientists just (discovered|found|made a terrifying|announced)\b`),
-		Weight:      0.45,
-		Name:        "Formula: Fake Science Alarmism",
-		Description: "Synthetic science alarmism template common in automated stock-video mills",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\b\d+\s+(shocking|insane|terrifying|unbelievable|mind-blowing)\s+(things|facts|secrets|discoveries)\b`),
-		Weight:      0.40,
-		Name:        "Formula: Numbered Shock List",
-		Description: "Automated listicle template for faceless channels",
-	},
-	{
 		Regex:       regexp.MustCompile(`(?i)\bjust (changed|ruined|destroyed) everything forever\b`),
-		Weight:      0.45,
+		Weight:      0.65,
+		Confidence:  0.90,
+		Category:    "formula",
 		Name:        "Formula: Hyperbolic Catastrophism",
 		Description: "Extreme hyperbolic clickbait typical of automated AI hype farms",
 	},
 	{
-		Regex:       regexp.MustCompile(`(?i)\bthe disturbing (reality|truth|secret) (of|behind|about)\b`),
-		Weight:      0.35,
-		Name:        "Formula: Disturbing Reality Trope",
-		Description: "Robotic drama/conspiracy narrative template",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\bmake \$\d+[\d,kKmM]*\s*(per|a|\/)\s*(day|month|week)\b`),
-		Weight:      0.60,
-		Name:        "Formula: Automated Earning Claim",
-		Description: "Formulaic earning promise commonly seen in automated scam mills",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\b(make|making|earn|earning) money (online )?(with|using) (ai|chatgpt|claude)\b`),
-		Weight:      0.55,
-		Name:        "Formula: AI Money Mill",
-		Description: "Automated content formula generating AI money-making slop",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\b(laziest|easiest|simplest) way to make money (with|using|online)?\b`),
-		Weight:      0.55,
-		Name:        "Formula: Lazy AI Income Template",
-		Description: "Formulaic hook for automated passive income channels",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\b(passive income|side hustle) (ideas )?(with|using) (ai|chatgpt|claude)\b`),
-		Weight:      0.50,
-		Name:        "Formula: AI Passive Income Scheme",
-		Description: "Automated listicle template for passive income with AI bots",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\bfaceless (ai )?(business|channel|youtube|video|influencer|model)\b`),
-		Weight:      0.55,
-		Name:        "Formula: Faceless Automation Farm",
-		Description: "Content generated by or promoting automated faceless channel factories",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\b(paste|copy) this into (chatgpt|claude|ai)\b`),
-		Weight:      0.60,
-		Name:        "Formula: AI Prompt Farm Hook",
-		Description: "Automated prompt-pasting clickbait template",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\bai (model|influencer) (side hustle|that'?s making)\b`),
-		Weight:      0.55,
-		Name:        "Formula: AI Influencer Farm",
-		Description: "Synthetic personality / virtual influencer farm template",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\bautomated (trading )?bot with ai\b`),
-		Weight:      0.50,
-		Name:        "Formula: Automated Bot Farm",
-		Description: "Automated trading/crypto bot hype template",
-	},
-	{
-		Regex:       regexp.MustCompile(`(?i)\b(chatgpt|ai) wrote this (script|video)\b`),
+		Regex:       regexp.MustCompile(`(?i)\bwhat happens next will (shock|terrify|amaze|blow)\b`),
 		Weight:      0.70,
-		Name:        "Formula: Explicit AI Admission",
-		Description: "Explicit declaration that script was authored by generative AI",
+		Confidence:  0.90,
+		Category:    "formula",
+		Name:        "Formula: Curiosity Gap Shock",
+		Description: "Formulaic curiosity gap designed to manipulate recommendation click-through rates",
 	},
 }
 
@@ -152,21 +221,38 @@ var LeakedPromptMarkers = []string{
 
 // AITags lists tags and hashtags that explicitly identify synthetic media generation tools.
 var AITags = map[string]float64{
-	"#midjourney":       0.45,
-	"#elevenlabs":       0.50,
-	"#aivoice":          0.50,
-	"#aiart":            0.35,
-	"#aigenerated":      0.55,
-	"#texttospeech":     0.45,
-	"#tts":              0.35,
-	"#sora":             0.40,
-	"#runwayml":         0.40,
-	"#stablediffusion":  0.40,
-	"#chatgpt":          0.30,
-	"#dalle":            0.35,
-	"#synthesia":        0.50,
-	"#heygen":           0.50,
-	"#facelessyoutube":  0.50,
+	"#midjourney":       0.60,
+	"#elevenlabs":       0.65,
+	"#aivoice":          0.65,
+	"#aiart":            0.50,
+	"#aigenerated":      0.70,
+	"#texttospeech":     0.60,
+	"#tts":              0.55,
+	"#sora":             0.60,
+	"#runwayml":         0.55,
+	"#stablediffusion":  0.55,
+	"#chatgpt":          0.50,
+	"#dalle":            0.50,
+	"#synthesia":        0.65,
+	"#heygen":           0.65,
+	"#facelessyoutube":  0.65,
+}
+
+// ClickbaitCapsWords are words commonly shouted in all-caps on automated clickbait thumbnails and titles.
+var ClickbaitCapsWords = map[string]bool{
+	"SHOCKING":     true,
+	"TERRIFYING":   true,
+	"UNBELIEVABLE": true,
+	"INSANE":       true,
+	"DISTURBING":   true,
+	"HORRIFYING":   true,
+	"MIND-BLOWING": true,
+	"EXPOSED":      true,
+	"BANNED":       true,
+	"DESTROYED":    true,
+	"NEVER":        true,
+	"URGENT":       true,
+	"SECRET":       true,
 }
 
 // EvaluateText inspects title and description for linguistic, structural, and metadata AI signals.
@@ -182,23 +268,45 @@ func EvaluateText(title, description string) []models.FilterSignal {
 			signals = append(signals, models.FilterSignal{
 				RuleName:    "Leaked LLM Prompt",
 				Category:    "lexical",
-				Weight:      0.85,
-				Confidence:  0.95,
+				Weight:      0.95,
+				Confidence:  0.98,
 				Description: "Contains leaked system prompt or AI refusal text: '" + marker + "'",
 				MatchedText: marker,
 			})
 		}
 	}
 
-	// 2. Check for LLM prose markers in title and description
+	// 2. Check compiled regular expression detection rules (AI tools, cash cows, reddit TTS, fake science, listicles)
+	for _, rule := range RegexDetectionRules {
+		if match := rule.Regex.FindString(title); match != "" {
+			signals = append(signals, models.FilterSignal{
+				RuleName:    rule.Name,
+				Category:    rule.Category,
+				Weight:      rule.Weight,
+				Confidence:  rule.Confidence,
+				Description: rule.Description + " in title",
+				MatchedText: match,
+			})
+		} else if match := rule.Regex.FindString(description); match != "" {
+			signals = append(signals, models.FilterSignal{
+				RuleName:    rule.Name + " (Description)",
+				Category:    rule.Category,
+				Weight:      rule.Weight * 0.90, // Slightly reduced weight if in description
+				Confidence:  rule.Confidence * 0.85,
+				Description: rule.Description + " in description",
+				MatchedText: match,
+			})
+		}
+	}
+
+	// 3. Check for LLM prose markers in title and description
 	for _, rule := range LLMPhrases {
 		if strings.Contains(titleLower, rule.Phrase) {
-			// Title triggers receive a 1.25x boost because titles are concise
 			signals = append(signals, models.FilterSignal{
 				RuleName:    "LLM Phrasing (Title)",
 				Category:    "lexical",
 				Weight:      rule.Weight * 1.25,
-				Confidence:  0.85,
+				Confidence:  0.90,
 				Description: rule.Description + " in video title",
 				MatchedText: rule.Phrase,
 			})
@@ -207,23 +315,9 @@ func EvaluateText(title, description string) []models.FilterSignal {
 				RuleName:    "LLM Phrasing (Description)",
 				Category:    "lexical",
 				Weight:      rule.Weight,
-				Confidence:  0.75,
+				Confidence:  0.80,
 				Description: rule.Description,
 				MatchedText: rule.Phrase,
-			})
-		}
-	}
-
-	// 3. Check for formulaic clickbait regex patterns
-	for _, rule := range FormulaRules {
-		if match := rule.Regex.FindString(title); match != "" {
-			signals = append(signals, models.FilterSignal{
-				RuleName:    rule.Name,
-				Category:    "formula",
-				Weight:      rule.Weight,
-				Confidence:  0.90,
-				Description: rule.Description,
-				MatchedText: match,
 			})
 		}
 	}
@@ -242,5 +336,75 @@ func EvaluateText(title, description string) []models.FilterSignal {
 		}
 	}
 
+	// 5. Title Formatting & Punctuation Anomalies (Shouting, Overkill Punctuation)
+	evaluateFormattingAnomalies(title, &signals)
+
 	return signals
+}
+
+// evaluateFormattingAnomalies detects screaming caps, sensationalist brackets, and punctuation overkill.
+func evaluateFormattingAnomalies(title string, signals *[]models.FilterSignal) {
+	words := strings.Fields(title)
+	var uppercaseCount int
+	var clickbaitCapsFound []string
+
+	for _, w := range words {
+		// Clean punctuation
+		cleaned := strings.TrimFunc(w, func(r rune) bool {
+			return !unicode.IsLetter(r) && !unicode.IsNumber(r)
+		})
+
+		if len(cleaned) >= 3 && cleaned == strings.ToUpper(cleaned) {
+			uppercaseCount++
+			if ClickbaitCapsWords[cleaned] {
+				clickbaitCapsFound = append(clickbaitCapsFound, cleaned)
+			}
+		}
+	}
+
+	// Excessive ALL-CAPS words (>= 3 words or clickbait words)
+	if len(clickbaitCapsFound) > 0 {
+		*signals = append(*signals, models.FilterSignal{
+			RuleName:    "Screaming Clickbait Words",
+			Category:    "formula",
+			Weight:      0.45,
+			Confidence:  0.85,
+			Description: "Contains sensationalist ALL-CAPS clickbait word(s): " + strings.Join(clickbaitCapsFound, ", "),
+			MatchedText: strings.Join(clickbaitCapsFound, ", "),
+		})
+	} else if uppercaseCount >= 4 {
+		*signals = append(*signals, models.FilterSignal{
+			RuleName:    "Excessive ALL-CAPS Shouting",
+			Category:    "formula",
+			Weight:      0.35,
+			Confidence:  0.80,
+			Description: "Title contains 4 or more ALL-CAPS shouted words",
+			MatchedText: "CAPS",
+		})
+	}
+
+	// Sensationalist punctuation spam: !! or ??? or !?! or [SHOCKING]
+	if strings.Contains(title, "!!") || strings.Contains(title, "???") || strings.Contains(title, "!?!") {
+		*signals = append(*signals, models.FilterSignal{
+			RuleName:    "Punctuation Overkill",
+			Category:    "formula",
+			Weight:      0.30,
+			Confidence:  0.80,
+			Description: "Sensationalist exclamation or question mark spam ('!!', '???')",
+			MatchedText: "!!",
+		})
+	}
+
+	// Sensationalist bracket markers
+	bracketRegex := regexp.MustCompile(`(?i)\[(shocking|must watch|gone wrong|emotional|no ai|banned|unbelievable|proof)\]`)
+	if match := bracketRegex.FindString(title); match != "" {
+		*signals = append(*signals, models.FilterSignal{
+			RuleName:    "Sensationalist Bracket Hook",
+			Category:    "formula",
+			Weight:      0.40,
+			Confidence:  0.85,
+			Description: "Clickbait bracket tag: " + match,
+			MatchedText: match,
+		})
+	}
 }
