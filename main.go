@@ -6,12 +6,24 @@ import (
 	"embed"
 	_ "embed"
 	"log"
+	"os"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/linux"
 )
+
+func init() {
+	// Wayland + NVIDIA / Hyprland Compatibility:
+	// On Wayland compositors (especially Hyprland, Sway, and GNOME Wayland with NVIDIA drivers),
+	// WebKit2GTK's DMA-BUF renderer triggers "Error 71 (Protocol error) dispatching to Wayland display".
+	// Setting WEBKIT_DISABLE_DMABUF_RENDERER=1 disables the problematic DMA-BUF subsurface pathway,
+	// allowing WebKit2GTK to render flawlessly on Wayland without protocol crashes.
+	if os.Getenv("WEBKIT_DISABLE_DMABUF_RENDERER") == "" {
+		_ = os.Setenv("WEBKIT_DISABLE_DMABUF_RENDERER", "1")
+	}
+}
 
 // assets embeds the compiled Vue 3 production distribution.
 //

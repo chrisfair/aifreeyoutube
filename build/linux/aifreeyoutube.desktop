@@ -4,7 +4,7 @@ Type=Application
 Name=AI-Free YouTube
 GenericName=Authentic Video Portal
 Comment=Watch YouTube content filtered of AI slop, clickbait mills, and bots
-Exec=aifreeyoutube %U
+Exec=env WEBKIT_DISABLE_DMABUF_RENDERER=1 aifreeyoutube %U
 Icon=aifreeyoutube
 Terminal=false
 Categories=AudioVideo;Video;Network;Player;
@@ -15,4 +15,4 @@ Actions=Trending;
 
 [Desktop Action Trending]
 Name=Trending Authentic Videos
-Exec=aifreeyoutube
+Exec=env WEBKIT_DISABLE_DMABUF_RENDERER=1 aifreeyoutube
