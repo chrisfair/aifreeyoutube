@@ -11,7 +11,7 @@ Version:        1.0.0
 Release:        1%{?dist}
 Summary:        Authentic human video portal filtering out AI slop on YouTube
 
-License:        MIT
+License:        GPL-3.0-or-later
 URL:            https://github.com/christopherpatrickfair/aifreeyoutube
 Source0:        %{name}-%{version}.tar.gz
 

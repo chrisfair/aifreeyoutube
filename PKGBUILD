@@ -7,7 +7,7 @@ pkgrel=1
 pkgdesc="Authentic human video portal filtering out AI slop, clickbait mills, and bots on YouTube"
 arch=('x86_64')
 url="https://github.com/christopherpatrickfair/aifreeyoutube"
-license=('MIT')
+license=('GPL-3.0-or-later')
 depends=(
     'webkit2gtk-4.1'
     'gtk3'
@@ -47,4 +47,7 @@ package() {
     
     # Install high-resolution 512x512 raster icon
     install -Dm644 "build/appicon.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/aifreeyoutube.png"
+
+    # Install license
+    install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

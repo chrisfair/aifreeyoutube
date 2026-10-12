@@ -11,6 +11,7 @@
     <projectUrl>https://github.com/christopherpatrickfair/aifreeyoutube</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/christopherpatrickfair/aifreeyoutube/main/build/appicon.png</iconUrl>
     <copyright>Copyright 2026 Christopher Patrick Fair</copyright>
+    <license type="expression">GPL-3.0-or-later</license>
     <licenseUrl>https://github.com/christopherpatrickfair/aifreeyoutube/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/christopherpatrickfair/aifreeyoutube</projectSourceUrl>

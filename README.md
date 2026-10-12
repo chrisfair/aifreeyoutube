@@ -450,4 +450,5 @@ You can switch between **YouTube Premium** and **Strict Privacy** mode anytime i
 
 ## License
 
-MIT License. Crafted for a cleaner, more human internet.
+GNU General Public License v3.0 (GPL-3.0). Crafted for a cleaner, more human internet.
+See [LICENSE](file:///home/christopher/Projects/aifreeyoutube/LICENSE) for full license terms.

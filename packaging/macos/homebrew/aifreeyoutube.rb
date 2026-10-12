@@ -13,7 +13,7 @@ class Aifreeyoutube < Formula
   desc "Authentic human video portal filtering out AI slop on YouTube"
   homepage "https://github.com/christopherpatrickfair/aifreeyoutube"
   version "1.0.0"
-  license "MIT"
+  license "GPL-3.0-or-later"
 
   on_macos do
     if Hardware::CPU.arm?
