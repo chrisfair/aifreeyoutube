@@ -318,13 +318,13 @@ makepkg -si
 
 ### Standalone Web Server Mode
 
-If you prefer running AI-Free YouTube as a headless or local web server on port 8080:
+If you prefer running AI-Free YouTube as a headless or local web server on port 8484:
 
 ```bash
 # Compile and start the server
 make run-server
 ```
-Visit **`http://localhost:8080`** in any browser.
+Visit **`http://localhost:8484`** in any browser.
 
 ### Frontend Hot-Reload Development
 

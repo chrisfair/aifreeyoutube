@@ -20,7 +20,7 @@ help:
 	@echo "  make uninstall-desktop Remove installed desktop app from $(PREFIX)"
 	@echo "  make package-arch      Build official Arch Linux package (.pkg.tar.zst) via makepkg"
 	@echo "  make server            Compile standalone Go web server (bin/aifreeyoutube-server)"
-	@echo "  make run-server        Launch standalone web server on http://localhost:8080"
+	@echo "  make run-server        Launch standalone web server on http://localhost:8484"
 	@echo "  make test              Execute comprehensive Go unit test suite"
 	@echo "  make clean             Clean compiled binaries and build caches"
 
@@ -72,14 +72,14 @@ server:
 	@echo "==> Web server binary compiled: bin/aifreeyoutube-server"
 
 run-server: server
-	@echo "==> Launching standalone web server on http://localhost:8080..."
+	@echo "==> Launching standalone web server on http://localhost:8484..."
 	./bin/aifreeyoutube-server
 
 service-start: server
 	@echo "==> Enabling and starting AI-Free YouTube background service..."
 	systemctl --user daemon-reload
 	systemctl --user enable --now aifreeyoutube
-	@echo "==> Service active! Web app available at http://localhost:8080"
+	@echo "==> Service active! Web app available at http://localhost:8484"
 
 service-stop:
 	@echo "==> Stopping AI-Free YouTube background service..."
